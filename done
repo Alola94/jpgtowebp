@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JPG to WebP Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+    #converter {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #output {
+      margin-top: 20px;
+    }
+
+    #output img {
+      max-width: 100%;
+      margin-top: 10px;
+    }
+
+    #downloadButton {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="converter">
+    <h2>JPG to WebP Converter</h2>
+    <input type="file" id="fileInput" accept="image/jpeg" />
+    <button onclick="convertToWebP()">Convert</button>
+    <div id="output"></div>
+    <a id="downloadLink" download="converted.webp" href="#" style="display: none;"></a>
+    <button id="downloadButton" style="display: none;" onclick="downloadWebP()">Download WebP</button>
+  </div>
+
+  <script>
+    function convertToWebP() {
+      var fileInput = document.getElementById('fileInput');
+      var outputDiv = document.getElementById('output');
+      
+      // Check if a file is selected
+      if (fileInput.files.length === 0) {
+        alert('Please select a JPG image file.');
+        return;
+      }
+      
+      var file = fileInput.files[0];
+      var reader = new FileReader();
+
+      reader.onload = function(event) {
+        var imgDataUrl = event.target.result;
+        var imgElement = document.createElement('img');
+
+        imgElement.onload = function() {
+          var canvas = document.createElement('canvas');
+          canvas.width = imgElement.width;
+          canvas.height = imgElement.height;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(imgElement, 0, 0);
+
+          canvas.toBlob(function(blob) {
+            var newImg = document.createElement('img');
+            var url = URL.createObjectURL(blob);
+            newImg.src = url;
+            outputDiv.innerHTML = '';
+            outputDiv.appendChild(newImg);
+
+            // Show download button
+            var downloadButton = document.getElementById('downloadButton');
+            var downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = url;
+            downloadButton.style.display = 'block';
+            downloadLink.style.display = 'none'; // Hide the link
+          }, 'image/webp', 1);
+        };
+
+        imgElement.src = imgDataUrl;
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function downloadWebP() {
+      var downloadLink = document.getElementById('downloadLink');
+      downloadLink.click();
+    }
+  </script>
+</body>
+</html>
